@@ -1,0 +1,13 @@
+diff --git a/tests/unit/scripting.tcl b/tests/unit/scripting.tcl
+index 48dc1c14d..4272e1b20 100644
+--- a/tests/unit/scripting.tcl
++++ b/tests/unit/scripting.tcl
+@@ -1657,7 +1657,7 @@ start_server {tags {"scripting repl external:skip"}} {
+ }
+ 
+ if {$is_eval eq 1 && $script_compatibility_api == "redis"} {
+-start_server {tags {"scripting external:skip"}} {
++start_server {tags {"scripting needs:debug external:skip"}} {
+     r script debug sync
+     r eval {return 'hello'} 0
+     r eval {return 'hello'} 0

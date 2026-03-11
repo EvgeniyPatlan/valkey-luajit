@@ -1,0 +1,9 @@
+build/
+*.o
+*.so
+*.dylib
+*.a
+.cache/
+tests/assets/
+tests/modules/
+*.pyc

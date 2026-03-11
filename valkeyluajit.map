@@ -1,0 +1,7 @@
+{
+    global:
+        luaopen_ffi;
+        ValkeyModule_*;
+    local:
+        *;
+};
