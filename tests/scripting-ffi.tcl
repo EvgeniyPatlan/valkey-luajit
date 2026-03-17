@@ -1,0 +1,38 @@
+start_server {tags {"scripting-ffi"}} {
+    test {FFI - Not accessible by default} {
+        r eval "local ffi = ffi; if ffi == nil then return 'not accessible' end" 0
+    } {not accessible}
+
+    test {FFI - Global VKM not accessible when FFI disabled} {
+        r eval "local VKM = VKM; if VKM == nil then return 'not accessible' end" 0
+    } {not accessible}
+
+    test {FFI - Runtime config set does not enable FFI} {
+        r config set luajit.enable-ffi-api yes
+
+        r eval "local ffi = ffi; if ffi == nil then return 'not accessible' end" 0
+    } {not accessible}
+}
+
+start_server {tags {"scripting-ffi"} overrides {luajit.enable-ffi-api yes}} {
+    test {FFI - Accessible when enabled in config} {
+        r eval "local ffi = ffi; return type(ffi)" 0
+    } {table}
+
+    test {FFI - VKM wrapper available} {
+        r eval "
+            local C = VKM.C
+            local ctx = VKM.ctx()
+            return 'VKM accessible'
+        " 0
+    } {VKM accessible}
+
+    test {FFI - VKM constants accessible} {
+        r eval "
+            -- Verify VKM constants are accessible
+            local read_val = VKM.READ
+            local write_val = VKM.WRITE
+            return {read_val, write_val}
+        " 0
+    } {1 2}
+}

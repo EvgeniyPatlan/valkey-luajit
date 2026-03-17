@@ -22,31 +22,21 @@ else
     echo "Valkey already downloaded at $VALKEY_DIR"
 fi
 
-# Apply all patches from tests/ directory
-PATCHES_DIR="$SCRIPT_DIR/tests"
-if compgen -G "$PATCHES_DIR/*.patch" > /dev/null; then
-    echo ""
-    echo "Applying patches..."
-    for patch_file in "$PATCHES_DIR"/*.patch; do
-        if [ -f "$patch_file" ]; then
-            echo "  Applying: $(basename "$patch_file")"
-            cd "$VALKEY_DIR"
-            if patch -p1 --dry-run < "$patch_file" > /dev/null 2>&1; then
-                patch -p1 < "$patch_file" || true
-            else
-                echo "    Patch already applied or not applicable, skipping"
-            fi
-        fi
-    done
-else
-    echo "No patches found in $PATCHES_DIR"
-fi
-
 # Build Valkey without built-in Lua
 echo ""
 echo "Building Valkey server..."
 cd "$VALKEY_DIR"
 make BUILD_LUA=no -j$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 4)
+
+# Copy custom test files to Valkey test directory
+echo ""
+echo "Copying custom tests..."
+if [ -d "$SCRIPT_DIR/tests" ] && [ -n "$(ls -A $SCRIPT_DIR/tests/*.tcl 2>/dev/null)" ]; then
+    cp "$SCRIPT_DIR/tests/"*.tcl "$VALKEY_DIR/tests/unit/"
+    echo "  Custom tests copied to $VALKEY_DIR/tests/unit/"
+else
+    echo "  No custom test files found in $SCRIPT_DIR/tests/"
+fi
 
 echo ""
 echo "== Test setup complete! =="
