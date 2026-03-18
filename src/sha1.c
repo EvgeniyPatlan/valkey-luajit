@@ -106,6 +106,7 @@ void SHA1Transform(uint32_t state[5], const unsigned char buffer[64])
     a = b = c = d = e = 0;
 #ifdef SHA1HANDSOFF
     memset(block, '\0', sizeof(block));
+    __asm__ __volatile__("" : : "r"(block) : "memory");
 #endif
 }
 
@@ -202,6 +203,8 @@ void SHA1Final(unsigned char digest[20], SHA1_CTX* context)
     }
     /* Wipe variables */
     memset(context, '\0', sizeof(*context));
+    __asm__ __volatile__("" : : "r"(context) : "memory");
     memset(&finalcount, '\0', sizeof(finalcount));
+    __asm__ __volatile__("" : : "r"(&finalcount) : "memory");
 }
 /* ================ end of sha1.c ================ */
